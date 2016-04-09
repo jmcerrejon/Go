@@ -7,7 +7,7 @@
  * x2 y2
  * ...
  *
- * TODO: · Arguments
+ * TODO: V Arguments
  * 	     · Check with RegEx the right input format
  * 	     · Split work with cores (using Go Routines)
  * 	     · Generate multiplatform binaries
@@ -16,12 +16,30 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 func main() {
-	fopen, err := os.Open("coords.txt")
+
+	if len(os.Args) < 2 {
+		// No arguments
+		fmt.Println("You must to specify a text file.")
+		os.Exit(0)
+	}
+
+	fileArgs := os.Args[1]
+
+	// Check type
+	// fmt.Println(reflect.TypeOf(os.Args))
+
+	// Take the file name without extension
+	var extension = filepath.Ext(fileArgs)
+	var fileName = fileArgs[0 : len(fileArgs)-len(extension)]
+
+	fopen, err := os.Open(fileArgs)
 	if err != nil {
 		// handle the error here
 		return
@@ -40,14 +58,17 @@ func main() {
 		return
 	}
 
+	// Logic
 	var newContent string
 	str := strings.Split(string(bs), " ")
 
 	for i := 0; i < len(str); i = i + 2 {
 		newContent += str[i] + " " + str[i+1] + "\n"
 	}
+	// End Logic
 
-	fwrite, err := os.Create("final.txt")
+	// Make & write the file
+	fwrite, err := os.Create(fileName + "_converted.txt")
 	if err != nil {
 		return
 	}
