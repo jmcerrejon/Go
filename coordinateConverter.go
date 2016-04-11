@@ -1,15 +1,15 @@
 /*
- * Program: coordinate converter
+ * Program: coordinates splitter
  * Author: Jose Manuel Cerrejon Gonzalez (ulysess _at_ gmail.com)
- * Version: 0.1 (4/9/16)
+ * Version: 0.1 (4/11/16)
  * Description: Get a "x1 y1 x2 y2" one-line coordinate system in a file and split into:
  * x1 y1
  * x2 y2
  * ...
  *
- * TODO: V Arguments
+ * TODO:     V Arguments
  * 	     · Check with RegEx the right input format
- * 	     · Split work with cores (using Go Routines)
+ * 	     V Split logic on process depending on cores (using Go Routines)
  * 	     · Generate multiplatform binaries
  */
 
@@ -19,8 +19,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 )
+
+// Run before main()
+func init() {
+	runtime.GOMAXPROCS(1)
+}
 
 func main() {
 
@@ -30,6 +37,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(1)
 	fileArgs := os.Args[1]
 
 	// Check type
@@ -58,14 +67,21 @@ func main() {
 		return
 	}
 
-	// Logic
 	var newContent string
 	str := strings.Split(string(bs), " ")
 
-	for i := 0; i < len(str); i = i + 2 {
-		newContent += str[i] + " " + str[i+1] + "\n"
-	}
-	// End Logic
+	// GoRoutine
+	go func() {
+
+		for i := 0; i < len(str); i = i + 2 {
+			newContent += str[i] + " " + str[i+1] + "\n"
+		}
+
+		wg.Done()
+	}()
+
+	// Wait to end the code above
+	wg.Wait()
 
 	// Make & write the file
 	fwrite, err := os.Create(fileName + "_converted.txt")
