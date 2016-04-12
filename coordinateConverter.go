@@ -1,16 +1,16 @@
 /*
  * Program: coordinates splitter
  * Author: Jose Manuel Cerrejon Gonzalez (ulysess _at_ gmail.com)
- * Version: 0.1 (4/11/16)
+ * Version: 0.3 (4/12/16)
  * Description: Get a "x1 y1 x2 y2" one-line coordinate system in a file and split into:
  * x1 y1
  * x2 y2
  * ...
  *
  * TODO:     V Arguments
- * 	     · Check with RegEx the right input format
+ * 	     - Check with RegEx the right input format
  * 	     V Split logic on process depending on cores (using Go Routines)
- * 	     · Generate multiplatform binaries
+ * 	     · Generate multiplatform binaries from OSX
  */
 
 package main
@@ -66,6 +66,16 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	// TODO: RegExp doesn't work with files (always false). The pattern is OK. Check out with the file coords.txt
+	//fContent := string(bs)
+
+	// Check if file has a valid format
+	// var isValidFormat = regexp.MustCompile(`^((\-?\d+(\.\d+)?) \s*(\-?\d+(\.\d+)?)\s?)+\n*$`)
+	// if !isValidFormat.MatchString(fContent) {
+	// 	fmt.Println("The file has not the right format, please verify if the file is valid.")
+	// 	os.Exit(0)
+	// }
 
 	var newContent string
 	str := strings.Split(string(bs), " ")
